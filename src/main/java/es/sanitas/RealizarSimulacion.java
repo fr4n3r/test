@@ -359,7 +359,7 @@ public class RealizarSimulacion {
             final List< ProductoPolizas > lProductos, final List< BeneficiarioPolizas > lBeneficiarios,
             final FrecuenciaEnum frecuencia ) throws ExcepcionContratacion {
 
-        TarificacionPoliza resultado = null;
+        TarificacionPoliza resultado;
         final Simulacion in = new Simulacion();
         final DatosContratacionPlan oDatosPlan = ( DatosContratacionPlan )hmValores
                 .get( StaticVarsContratacion.DATOS_PLAN );
@@ -741,7 +741,7 @@ public class RealizarSimulacion {
             fecha = EDAD_MINIMA;
         }
 
-        if( fecha != null && !fecha.contains( "/" ) ) {
+        if(!fecha.contains( "/" )) {
             final int edad = Integer.valueOf( fecha );
             final Calendar dob = Calendar.getInstance();
             dob.add( Calendar.YEAR, -edad );
