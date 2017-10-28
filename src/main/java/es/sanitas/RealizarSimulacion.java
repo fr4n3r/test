@@ -72,6 +72,7 @@ public class RealizarSimulacion {
     private static final String LINE_BREAK = "<br/>";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
     private final String FECHA_EMISION = "25/12/2016";
+    private final String EDAD_MINIMA = "18";
     private final Double MULTIPLICADOR_RECIBO = 1000.;
 
     private static final int NUMERO_HILOS = 4;
@@ -693,15 +694,10 @@ public class RealizarSimulacion {
     }
 
     private Cobertura[] obtenerCoberturas( final int idProducto, final DatosContratacionPlan oDatosPlan ) {
-        final List< Cobertura > coberturas = new ArrayList< Cobertura >();
-
-        final Iterator< DatosPlanProducto > iteradorProdsPlan = oDatosPlan.getProductos().iterator();
-        boolean found = false;
-        while( iteradorProdsPlan.hasNext() && !found ) {
-            final DatosPlanProducto productoPlan = iteradorProdsPlan.next();
-            if( idProducto == productoPlan.getIdProducto() ) {
-                found = true;
-                for( final DatosCobertura oDatosCobertura : productoPlan.getCoberturas() ) {
+        final List< Cobertura > coberturas = new ArrayList<>();
+        for (DatosPlanProducto datosPlanProducto: oDatosPlan.getProductos()){
+            if( idProducto == datosPlanProducto.getIdProducto() ) {
+                for( final DatosCobertura oDatosCobertura : datosPlanProducto.getCoberturas() ) {
                     if( oDatosCobertura.isSwObligatorio()
                             && oDatosCobertura.getCapitalMinimo() != null
                             && oDatosCobertura.getCapitalMinimo() > 0 ) {
@@ -712,8 +708,10 @@ public class RealizarSimulacion {
                         coberturas.add( cobertura );
                     }
                 }
+                break;
             }
         }
+
 
         return coberturas.toArray( new Cobertura[ 0 ] );
     }
@@ -730,7 +728,7 @@ public class RealizarSimulacion {
 
         if( fecha == null || "//".equals( fecha ) ) {
             // Si viene null, le ponemos que tiene 18
-            fecha = "18";
+            fecha = EDAD_MINIMA;
         }
 
         if( fecha != null && !fecha.contains( "/" ) ) {
