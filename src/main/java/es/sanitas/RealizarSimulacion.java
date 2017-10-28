@@ -1,37 +1,7 @@
 package es.sanitas;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import es.sanitas.bravo.ws.stubs.contratacionws.consultasoperaciones.DatosCobertura;
 import es.sanitas.bravo.ws.stubs.contratacionws.consultasoperaciones.DatosContratacionPlan;
 import es.sanitas.bravo.ws.stubs.contratacionws.consultasoperaciones.DatosPlanProducto;
@@ -62,11 +32,39 @@ import es.sanitas.soporte.SimulacionWS;
 import es.sanitas.soporte.StaticVarsContratacion;
 import es.sanitas.soporte.TarificacionPoliza;
 import es.sanitas.soporte.TipoPromocionEnum;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wscontratacion.beneficiario.vo.ProductoCobertura;
 import wscontratacion.contratacion.fuentes.parametros.DatosAlta;
 import wscontratacion.contratacion.fuentes.parametros.DatosAsegurado;
 import wscontratacion.contratacion.fuentes.parametros.DatosDomicilio;
 import wscontratacion.contratacion.fuentes.parametros.DatosProductoAlta;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 
 public class RealizarSimulacion {
@@ -520,11 +518,7 @@ public class RealizarSimulacion {
                 final Producto[] productos = obtenerProductosAsegurado(
                         oDatosAlta.getTitular().getProductosContratados(), oDatosPlan );
                 beneficiario.setListaProductos( productos );
-                /*
-                 * String tarjeta = oBeneficiario.getSNumTarjetaSanitas(); if( !StringUtils.isEmpty(
-                 * tarjeta ) ) { obtenerProcedencia(tarjeta, oBeneficiario.getDatosPersonales(),
-                 * beneficiario); }
-                 */
+
                 beneficiarios.add( beneficiario );
             }
         } else {
@@ -582,9 +576,9 @@ public class RealizarSimulacion {
                             cambiarFecha( oDatosAsegurado.getDatosPersonales().getFNacimiento(),
                                     oDatosAlta.getFAlta() ) );
                     beneficiario.setParentesco( 11 );
-                    // Bravo son unos tocapelotas y aunque permiten el genero 3 cuando no hay uno
-                    // definido no podemos usarlo.
-                    // Así que enviamos un 2 (por temas de ginecologia tambien).
+                    /* Permiten el genero 3 cuando no hay uno definido no podemos usarlo.
+                    Así que enviamos un 2 (por temas de ginecologia tambien).
+                     */
                     beneficiario.setSexo( oDatosAsegurado.getDatosPersonales().getGenSexo() == 0 ? 2
                             : oDatosAsegurado.getDatosPersonales().getGenSexo() );
                     beneficiario.setNombre( oDatosAsegurado.getDatosPersonales().getNombre() );
@@ -603,12 +597,6 @@ public class RealizarSimulacion {
                     }
                     beneficiario.setListaProductos( productos );
 
-                    /*
-                     * if (tarjetas != null && tarjetas.size() > contadorBeneficiario){ String
-                     * tarjeta = tarjetas.get( contadorBeneficiario ); obtenerProcedencia(tarjeta,
-                     * oDatosAsegurado.getDatosPersonales(), beneficiario); }else{
-                     * beneficiario.setProcedencia( obtenerProcedencia(lProductos) ); }
-                     */
                     beneficiarios.add( beneficiario );
                     contadorBeneficiario++;
                 }
@@ -710,31 +698,6 @@ public class RealizarSimulacion {
         return coberturas.toArray( new Cobertura[ 0 ] );
     }
 
-    /*
-     * private Procedencia obtenerProcedencia( List<ProductoPolizas> lProductos ) { Procedencia
-     * procedencia = null; if (lProductos != null && !lProductos.isEmpty()){ procedencia = new
-     * Procedencia(); procedencia.setIdColectivo( ( ( ProductoPolizas )lProductos.get( 0 )
-     * ).getIdColectivo() ); procedencia.setIdPoliza( ( ( ProductoPolizas )lProductos.get( 0 )
-     * ).getIdPoliza().intValue() ); procedencia.setIdCompania( ( ( ProductoPolizas )lProductos.get(
-     * 0 ) ).getIdCompania() ); } return procedencia; } private void obtenerProcedencia(String
-     * tarjeta, DatosPersona datosPersonales,
-     * es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario beneficiario){
-     * IRecuperarDatosTarjetaDAO oRecuperarDatosTarj = new RecuperarDatosTarjetaDAO(); try {
-     * @SuppressWarnings( "unchecked" ) Map<String, Object> hmRetorno =
-     * oRecuperarDatosTarj.recuperar( tarjeta ); if( hmRetorno.get( Constantes.COD_CLIENTE ) != null
-     * ) { Procedencia datosProcedencia = new Procedencia(); beneficiario.setIdCliente(
-     * Integer.valueOf( String.valueOf( hmRetorno.get( Constantes.COD_CLIENTE ) ) ) ); PolizaBasico
-     * oPoliza = ( PolizaBasico )hmRetorno.get( Constantes.BEAN_POLIZA );
-     * datosProcedencia.setIdColectivo( Long.valueOf( oPoliza.getNumColectivo() ).intValue() );
-     * datosProcedencia.setIdPoliza( Long.valueOf( oPoliza.getNumPoliza() ).intValue() );
-     * datosProcedencia.setIdCompania( Long.valueOf( oPoliza.getCompania() ).intValue() );
-     * util.datos.Beneficiario benef = ( util.datos.Beneficiario )hmRetorno.get(
-     * Constantes.BENEFICIARIOS ); SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-     * datosPersonales.setFNacimiento(sdf.format( benef.getFNacimiento() ) );
-     * datosPersonales.setGenSexo( benef.getIdSexo() ); beneficiario.setProcedencia(
-     * datosProcedencia ); } } catch( Exception e ) { LOG.warn(
-     * "No se ha podido recuperar los datos de la tarjeta " + tarjeta, e ); } }
-     */
     /**
      * Método que recibe una fecha en formato String. Si la fecha está en formato edad, lo
      * transforma a formato fecha.
