@@ -71,6 +71,8 @@ public class RealizarSimulacion {
 
     private static final String LINE_BREAK = "<br/>";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private final String FECHA_EMISION = "25/12/2016";
+    private final Double MULTIPLICADOR_RECIBO = 1000.;
 
     private static final int NUMERO_HILOS = 4;
     private static final int TIMEOUT = 30;
@@ -865,13 +867,12 @@ public class RealizarSimulacion {
             reciboParam = new es.sanitas.soporte.Recibo();
             final Calendar fechaEmision = Calendar.getInstance();
             try {
-                fechaEmision.setTime( sdf.parse( "25/12/2016" ) );
+                fechaEmision.setTime( sdf.parse(FECHA_EMISION) );
             } catch( final ParseException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error("Error: ", e);
             }
             reciboParam.setFechaEmision( fechaEmision );
-            reciboParam.setImporte( recibo.getIdProducto() * 1000. );
+            reciboParam.setImporte( recibo.getIdProducto() * MULTIPLICADOR_RECIBO);
         }
         return reciboParam;
     }
