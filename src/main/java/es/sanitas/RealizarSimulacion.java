@@ -138,29 +138,8 @@ public class RealizarSimulacion {
                 LOG.error( "RejectedExecutionException con el metodo " + s.toString(), ree );
             }
         }
-        final List< TarificacionPoliza > resultadoSimulaciones = new ArrayList< TarificacionPoliza >();
-        final List< ExecutionException > resultadoExcepciones = new ArrayList< ExecutionException >();
-        for( int i = 0; i < n; ++i ) {
-            try {
-                final Future< TarificacionPoliza > future = ecs.poll( TIMEOUT, TimeUnit.SECONDS );
-                if( future != null ) {
-                    resultadoSimulaciones.add( future.get() );
-                } else {
-                    LOG.error(
-                            "La llamada asincrona al servicio de simulacion ha fallado por timeout" );
-                }
-            } catch( final InterruptedException e ) {
-                LOG.error( "InterruptedException", e );
-            } catch( final ExecutionException e ) {
-                LOG.error( "ExecutionException", e );
-                resultadoExcepciones.add( e );
-            }
-        }
+        final List< TarificacionPoliza > resultadoSimulaciones = llamadaAsincronaServicioSimulacion(n, ecs);
 
-        if( !resultadoExcepciones.isEmpty() ) {
-            throw new ExcepcionContratacion(
-                    resultadoExcepciones.get( 0 ).getCause().getMessage() );
-        }
 
         for( final FrecuenciaEnum frecuencia : frecuenciasTarificar ) {
             final TarificacionPoliza retornoPoliza = IterableUtils.find( resultadoSimulaciones,
@@ -321,6 +300,34 @@ public class RealizarSimulacion {
             frecuenciasTarificar = EnumSet.allOf( FrecuenciaEnum.class );
         }
         return frecuenciasTarificar;
+    }
+
+    private List<TarificacionPoliza> llamadaAsincronaServicioSimulacion(final int n, final CompletionService<TarificacionPoliza> ecs) throws ExcepcionContratacion {
+        final List<TarificacionPoliza> resultadoSimulaciones = new ArrayList<>();
+        final List<ExecutionException> resultadoExcepciones = new ArrayList<>();
+
+        for( int i = 0; i < n; ++i ) {
+            try {
+                final Future< TarificacionPoliza > future = ecs.poll( TIMEOUT, TimeUnit.SECONDS );
+                if( future != null ) {
+                    resultadoSimulaciones.add( future.get() );
+                } else {
+                    LOG.error(
+                            "La llamada asincrona al servicio de simulacion ha fallado por timeout" );
+                }
+            } catch( final InterruptedException e ) {
+                LOG.error( "InterruptedException", e );
+            } catch( final ExecutionException e ) {
+                LOG.error( "ExecutionException", e );
+                resultadoExcepciones.add( e );
+            }
+        }
+
+        if( !resultadoExcepciones.isEmpty() ) {
+            throw new ExcepcionContratacion(
+                    resultadoExcepciones.get( 0 ).getCause().getMessage() );
+        }
+        return resultadoSimulaciones;
     }
 
     private Callable< TarificacionPoliza > simularPolizaFrecuencia(
