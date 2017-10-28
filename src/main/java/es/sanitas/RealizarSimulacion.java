@@ -485,13 +485,13 @@ public class RealizarSimulacion {
             // El número de póliza debe indicarse para inclusiones de beneficiarios
             // y todas las operaciones (altas/inclusiones de productos) de pólizas colectivas
             // No debe indicarse para inclusiones de productos particulares
-            if (StaticVarsContratacion.INCLUSION_BENEFICIARIO == tipoOperacion.intValue()
+            if (StaticVarsContratacion.INCLUSION_BENEFICIARIO == tipoOperacion
                     || oDatosAltaAsegurados.getIdColectivo() > 0
                     || (oDatosAlta.getIdDepartamento() >= 0 && oDatosAlta.getIdEmpresa() != null)) {
                 infoContratacion.setIdPoliza( idPoliza.intValue() );
             }
             // El número de colectivo se debe incluir en inclusiones de beneficiarios
-            if( StaticVarsContratacion.INCLUSION_BENEFICIARIO == tipoOperacion.intValue()) {
+            if( StaticVarsContratacion.INCLUSION_BENEFICIARIO == tipoOperacion) {
                 infoContratacion.setIdColectivo( oDatosAltaAsegurados.getIdColectivo());
             }
             // El número de departamento debe incluirse en operaciones con pólizas colectivas
