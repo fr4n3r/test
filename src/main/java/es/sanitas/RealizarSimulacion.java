@@ -810,7 +810,7 @@ public class RealizarSimulacion {
 
         List< PromocionAplicada > promocionesAgrupadas = new ArrayList<>();
         if( promociones != null && promociones.length > 0 ) {
-            LOG.debug( promociones.toString() );
+            LOG.debug(Arrays.toString(promociones));
             final int numPromociones = promociones.length / numeroAsegurados;
             promocionesAgrupadas = toPromocionAplicadaList(
                     Arrays.copyOfRange( promociones, 0, numPromociones ) );
