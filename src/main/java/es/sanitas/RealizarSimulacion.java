@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wscontratacion.beneficiario.vo.ProductoCobertura;
 import wscontratacion.contratacion.fuentes.parametros.DatosAlta;
-import wscontratacion.contratacion.fuentes.parametros.DatosAsegurado;
 import wscontratacion.contratacion.fuentes.parametros.DatosDomicilio;
 import wscontratacion.contratacion.fuentes.parametros.DatosProductoAlta;
 
@@ -766,11 +765,9 @@ public class RealizarSimulacion {
         }
         if( oDatosAlta != null && oDatosAlta.getAsegurados() != null
                 && oDatosAlta.getAsegurados().size() > 0 ) {
-            @SuppressWarnings( "unchecked" ) final Iterator< DatosAseguradoInclusion > iterAseg = oDatosAlta
-                    .getAsegurados().iterator();
-            while( iterAseg.hasNext() ) {
-                final DatosAsegurado aseg = iterAseg.next();
-                if( "S".equals( aseg.getSwPolizaAnterior() ) ) {
+            for (DatosAseguradoInclusion aseg : (Iterable<DatosAseguradoInclusion>) oDatosAlta
+                    .getAsegurados()) {
+                if ("S".equals(aseg.getSwPolizaAnterior())) {
                     tieneTarjeta = true;
                 }
             }
