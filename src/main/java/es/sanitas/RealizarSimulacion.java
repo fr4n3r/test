@@ -822,14 +822,16 @@ public class RealizarSimulacion {
      */
     private PromocionAplicada toPromocionAplicada( final Promocion promocion ) {
         PromocionAplicada promocionParam = null;
-        if( promocion != null ) {
-            promocionParam = new PromocionAplicada();
-            promocionParam.setIdPromocion( promocion.getIdPromocion() != null
-                    ? Long.valueOf( promocion.getIdPromocion() ) : null );
-            promocionParam.setDescripcion( promocion.getDescripcion() );
-            promocionParam.setTipoPromocion(
-                    TipoPromocionEnum.obtenerTipoPromocion( promocion.getTipo() ) );
+        if( promocion == null ) {
+            return promocionParam;
         }
+        promocionParam = new PromocionAplicada();
+        promocionParam.setIdPromocion( promocion.getIdPromocion() != null
+                ? Long.valueOf( promocion.getIdPromocion() ) : null );
+        promocionParam.setDescripcion( promocion.getDescripcion() );
+        promocionParam.setTipoPromocion(
+                TipoPromocionEnum.obtenerTipoPromocion( promocion.getTipo() ) );
+
         return promocionParam;
     }
 
