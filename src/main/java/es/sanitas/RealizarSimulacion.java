@@ -843,14 +843,17 @@ public class RealizarSimulacion {
     private List< es.sanitas.soporte.Recibo > toReciboList( final ReciboProducto[] recibos ) {
         final List< es.sanitas.soporte.Recibo > recibosList = new LinkedList< es.sanitas.soporte.Recibo >();
 
-        if( recibos != null ) {
-            for( final ReciboProducto recibo : recibos ) {
-                final es.sanitas.soporte.Recibo reciboParam = toRecibo( recibo );
-                if( reciboParam != null ) {
-                    recibosList.add( reciboParam );
-                }
+        if( recibos == null ) {
+            return recibosList;
+        }
+
+        for( final ReciboProducto recibo : recibos ) {
+            final es.sanitas.soporte.Recibo reciboParam = toRecibo( recibo );
+            if( reciboParam != null ) {
+                recibosList.add( reciboParam );
             }
         }
+
         return recibosList;
     }
 
