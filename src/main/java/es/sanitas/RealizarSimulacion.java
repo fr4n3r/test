@@ -166,10 +166,9 @@ public class RealizarSimulacion {
                     primasDesglosadas.add( listaProductoPorAseg );
                 }
 
-                Primas primaAsegurado = new Primas();
-                if( primas.size() > contadorBeneficiario ) {
-                    primaAsegurado = primas.get( contadorBeneficiario );
-                } else {
+
+                if( primas.size() < contadorBeneficiario ) {
+                    Primas primaAsegurado = new Primas();
                     primas.add( primaAsegurado );
                 }
 
