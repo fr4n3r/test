@@ -633,7 +633,7 @@ public class RealizarSimulacion {
      * Comprueba si alguna de las promociones aplicadas en la simulación es un descuento en la
      * prima.
      *
-     * @param out
+     * @param promocionesAplicadas
      *            simulación múltiple realizada
      */
     private boolean hayPromocionDescuento(
