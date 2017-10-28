@@ -99,13 +99,11 @@ public class RealizarSimulacion {
      *         por asegurado
      * @throws Exception
      *             Excepción lanzada en caso de que haya errores
-     * @throws ExcepcionContratacion
-     *             Excepción controlada
      */
     public Map< String, Object > realizarSimulacion( final DatosAlta oDatosAlta,
             final List< ProductoPolizas > lProductos, final List< BeneficiarioPolizas > lBeneficiarios,
             final boolean desglosar, final Map< String, Object > hmValores )
-            throws Exception, ExcepcionContratacion {
+            throws Exception {
 
         final Map< String, Object > hmSimulacion = new HashMap< String, Object >();
         @SuppressWarnings( "unchecked" ) final List< String > lExcepciones = ( List< String > )hmValores
@@ -159,13 +157,12 @@ public class RealizarSimulacion {
             double css = 0;
             for( final TarifaBeneficiario tarifaBeneficiario : retorno.getTarifas()
                     .getTarifaBeneficiarios() ) {
-                List< PrimasPorProducto > listaProductoPorAseg = new ArrayList< PrimasPorProducto >();
+                List< PrimasPorProducto > listaProductoPorAseg = new ArrayList<>();
                 if( primasDesglosadas.size() > contadorBeneficiario ) {
                     listaProductoPorAseg = primasDesglosadas.get( contadorBeneficiario );
                 } else {
                     primasDesglosadas.add( listaProductoPorAseg );
                 }
-
 
                 if( primas.size() < contadorBeneficiario ) {
                     Primas primaAsegurado = new Primas();
