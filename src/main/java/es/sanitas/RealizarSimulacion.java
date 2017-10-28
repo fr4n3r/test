@@ -654,22 +654,21 @@ public class RealizarSimulacion {
         return productos.toArray( new Producto[ 0 ] );
     }
 
-    private Producto obtenerProducto( final DatosProductoAlta productoAlta,
-            final DatosContratacionPlan oDatosPlan ) {
+    private Producto getProducto(final int idProducto, final DatosContratacionPlan oDatosPlan){
         final Producto producto = new Producto();
-        final int idProducto = productoAlta.getIdProducto();
-        producto.setIdProducto( idProducto );
+        producto.setIdProducto(idProducto);
         producto.setListaCoberturas( obtenerCoberturas( idProducto, oDatosPlan ) );
         return producto;
     }
 
+    private Producto obtenerProducto( final DatosProductoAlta productoAlta,
+            final DatosContratacionPlan oDatosPlan ) {
+        return getProducto(productoAlta.getIdProducto(), oDatosPlan);
+    }
+
     private Producto obtenerProducto( final ProductoCobertura productoCobertura,
             final DatosContratacionPlan oDatosPlan ) {
-        final Producto producto = new Producto();
-        final int idProducto = productoCobertura.getIdProducto();
-        producto.setIdProducto( idProducto );
-        producto.setListaCoberturas( obtenerCoberturas( idProducto, oDatosPlan ) );
-        return producto;
+        return getProducto(productoCobertura.getIdProducto(), oDatosPlan);
     }
 
     private Cobertura[] obtenerCoberturas( final int idProducto, final DatosContratacionPlan oDatosPlan ) {
