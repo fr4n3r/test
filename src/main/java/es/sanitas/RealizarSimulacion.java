@@ -119,19 +119,7 @@ public class RealizarSimulacion {
         final List< List< es.sanitas.soporte.Recibo > > recibos = new ArrayList< List< es.sanitas.soporte.Recibo > >();
         final List< String > errores = new ArrayList< String >();
 
-        Set< FrecuenciaEnum > frecuenciasTarificar = EnumSet.noneOf( FrecuenciaEnum.class );
-        if( hmValores.containsKey( StaticVarsContratacion.FREC_MENSUAL ) ) {
-            frecuenciasTarificar.clear();
-            frecuenciasTarificar.add( FrecuenciaEnum.MENSUAL );
-        }
-        if( lBeneficiarios != null ) {
-            frecuenciasTarificar.clear();
-            frecuenciasTarificar
-                    .add( FrecuenciaEnum.obtenerFrecuencia( oDatosAlta.getGenFrecuenciaPago() ) );
-        }
-        if( frecuenciasTarificar.isEmpty() ) {
-            frecuenciasTarificar = EnumSet.allOf( FrecuenciaEnum.class );
-        }
+        Set< FrecuenciaEnum > frecuenciasTarificar = resolverFrecuenciasTarificar(hmValores, lBeneficiarios, oDatosAlta);
 
         final Collection< Callable< TarificacionPoliza > > solvers = new ArrayList< Callable< TarificacionPoliza > >(
                 0 );
@@ -314,6 +302,25 @@ public class RealizarSimulacion {
             hmSimulacion.put( StaticVarsContratacion.PRECIOS_SIN_PROMOCION_SIMULACION, pagoTotal );
         }
         return hmSimulacion;
+    }
+
+    private Set< FrecuenciaEnum > resolverFrecuenciasTarificar(final Map< String, Object > hmValores,
+                                                               final List< BeneficiarioPolizas > lBeneficiarios,
+                                                               final DatosAlta oDatosAlta){
+        Set< FrecuenciaEnum > frecuenciasTarificar = EnumSet.noneOf( FrecuenciaEnum.class );
+        if( hmValores.containsKey( StaticVarsContratacion.FREC_MENSUAL ) ) {
+            frecuenciasTarificar.clear();
+            frecuenciasTarificar.add( FrecuenciaEnum.MENSUAL );
+        }
+        if( lBeneficiarios != null ) {
+            frecuenciasTarificar.clear();
+            frecuenciasTarificar
+                    .add( FrecuenciaEnum.obtenerFrecuencia( oDatosAlta.getGenFrecuenciaPago() ) );
+        }
+        if( frecuenciasTarificar.isEmpty() ) {
+            frecuenciasTarificar = EnumSet.allOf( FrecuenciaEnum.class );
+        }
+        return frecuenciasTarificar;
     }
 
     private Callable< TarificacionPoliza > simularPolizaFrecuencia(
