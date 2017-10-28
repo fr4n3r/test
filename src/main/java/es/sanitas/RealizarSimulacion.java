@@ -914,11 +914,9 @@ public class RealizarSimulacion {
      */
     public static boolean comprobarExcepcion( final List<String> lExcepciones, final String comprobar ) {
         LOG.debug( "Se va a comprobar si " + comprobar + " está en la lista " + lExcepciones );
-        boolean bExcepcion = false;
-        if( comprobar != null && lExcepciones != null && lExcepciones.contains( comprobar ) ) {
-            bExcepcion = true;
-        }
-        return bExcepcion;
+
+        return comprobar != null && lExcepciones != null && lExcepciones.contains( comprobar );
+
     }
 
 }
