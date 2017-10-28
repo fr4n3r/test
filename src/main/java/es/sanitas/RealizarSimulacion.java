@@ -516,113 +516,120 @@ public class RealizarSimulacion {
         return infoContratacion;
     }
 
-    protected es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario[] obtenerBeneficiarios(
-            final DatosAlta oDatosAlta, final List< ProductoPolizas > lProductos,
-            final List< BeneficiarioPolizas > lBeneficiarios, final DatosContratacionPlan oDatosPlan ) {
-        final List< es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario > beneficiarios = new ArrayList< es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario >();
+    private  List<es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario> incluirBeneficiarios(final List< BeneficiarioPolizas> lBeneficiarios,
+                                                                                                                final DatosAlta oDatosAlta,
+                                                                                                                final DatosContratacionPlan oDatosPlan){
+        final List<es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario> beneficiarios = new ArrayList<>();
+        for( final BeneficiarioPolizas oBeneficiario : lBeneficiarios ) {
+            final es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
+            beneficiario.setFechaNacimiento(
+                    cambiarFecha( oBeneficiario.getDatosPersonales().getFNacimiento(),
+                            oDatosAlta.getFAlta() ) );
+            beneficiario.setParentesco( 11 );
+            beneficiario.setSexo( oBeneficiario.getDatosPersonales().getGenSexo() );
+            if( oBeneficiario.getDatosPersonales().getIdProfesion() > 0 ) {
+                beneficiario
+                        .setIdProfesion( oBeneficiario.getDatosPersonales().getIdProfesion() );
+            } else {
+                beneficiario.setIdProfesion( 1 );
+            }
+            beneficiario.setNombre( oBeneficiario.getDatosPersonales().getNombre() );
+            final Producto[] productos = obtenerProductosAsegurado(
+                    oDatosAlta.getTitular().getProductosContratados(), oDatosPlan );
+            beneficiario.setListaProductos( productos );
 
-        // Si hay lista de beneficiarios se trata de una inclusion de beneficiarios
-        if( lBeneficiarios != null && lBeneficiarios.size() > 0 ) {
-            for( final BeneficiarioPolizas oBeneficiario : lBeneficiarios ) {
-                final es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
+            beneficiarios.add( beneficiario );
+        }
+        return beneficiarios;
+    }
+
+    private List<es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario> altaBeneficiario(final DatosAlta oDatosAlta,
+                                                                                                           final DatosContratacionPlan oDatosPlan,
+                                                                                                           final List< ProductoPolizas > lProductos){
+        final List<es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario> beneficiarios = new ArrayList<>();
+        // Primero se procesa el titular
+        es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
+
+        beneficiario.setFechaNacimiento(
+                cambiarFecha( oDatosAlta.getTitular().getDatosPersonales().getFNacimiento(),
+                        oDatosAlta.getFAlta() ) );
+        beneficiario.setParentesco( 1 );
+        // aunque se permite el genero 3 cuando no hay uno definido no podemos usarlo.
+        // Así que enviamos un 2 (por temas de ginecologia tambien).
+        beneficiario.setSexo( oDatosAlta.getTitular().getDatosPersonales().getGenSexo() == 0 ? 2
+                : oDatosAlta.getTitular().getDatosPersonales().getGenSexo() );
+        beneficiario.setIdProfesion( 1 );
+        beneficiario.setNombre(
+                String.valueOf( oDatosAlta.getTitular().getDatosPersonales().getNombre() ) );
+        if( oDatosAlta.getTitular() instanceof DatosAseguradoInclusion ) {
+            final DatosAseguradoInclusion dai = ( DatosAseguradoInclusion )oDatosAlta.getTitular();
+            if( dai.getSIdCliente() != null && dai.getSIdCliente() > 0 ) {
+                beneficiario.setIdCliente( dai.getSIdCliente().intValue() );
+            }
+        }
+
+        // Si hay lista de productos se incluyen como productos añadidos al alta
+        Producto[] productos = obtenerProductosAsegurado(
+                oDatosAlta.getTitular().getProductosContratados(), oDatosPlan );
+        if( lProductos != null && !lProductos.isEmpty() ) {
+            productos = ArrayUtils.addAll( productos,
+                    obtenerProductos( lProductos.get( 0 ).getProductos(), oDatosPlan ) );
+        }
+        beneficiario.setListaProductos( productos );
+        beneficiarios.add( beneficiario );
+
+        // Y luego se procesan el resto de asegurados
+        if( oDatosAlta.getAsegurados() != null && oDatosAlta.getAsegurados().size() > 0 ) {
+            final Iterator< DatosAseguradoInclusion > iteradorAsegurados = oDatosAlta.getAsegurados()
+                    .iterator();
+            int contadorBeneficiario = 1;
+            while( iteradorAsegurados.hasNext() ) {
+                final DatosAseguradoInclusion oDatosAsegurado = iteradorAsegurados.next();
+
+                beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
+
                 beneficiario.setFechaNacimiento(
-                        cambiarFecha( oBeneficiario.getDatosPersonales().getFNacimiento(),
+                        cambiarFecha( oDatosAsegurado.getDatosPersonales().getFNacimiento(),
                                 oDatosAlta.getFAlta() ) );
                 beneficiario.setParentesco( 11 );
-                beneficiario.setSexo( oBeneficiario.getDatosPersonales().getGenSexo() );
-                if( oBeneficiario.getDatosPersonales().getIdProfesion() > 0 ) {
-                    beneficiario
-                            .setIdProfesion( oBeneficiario.getDatosPersonales().getIdProfesion() );
-                } else {
-                    beneficiario.setIdProfesion( 1 );
+                /* Permiten el genero 3 cuando no hay uno definido no podemos usarlo.
+                Así que enviamos un 2 (por temas de ginecologia tambien).
+                 */
+                beneficiario.setSexo( oDatosAsegurado.getDatosPersonales().getGenSexo() == 0 ? 2
+                        : oDatosAsegurado.getDatosPersonales().getGenSexo() );
+                beneficiario.setNombre( oDatosAsegurado.getDatosPersonales().getNombre() );
+                beneficiario.setIdProfesion( 1 );
+                if( oDatosAsegurado.getSIdCliente() != null ) {
+                    beneficiario.setIdCliente( oDatosAsegurado.getSIdCliente().intValue() );
                 }
-                beneficiario.setNombre( oBeneficiario.getDatosPersonales().getNombre() );
-                final Producto[] productos = obtenerProductosAsegurado(
-                        oDatosAlta.getTitular().getProductosContratados(), oDatosPlan );
+
+                productos = obtenerProductosAsegurado(
+                        oDatosAsegurado.getProductosContratados(), oDatosPlan );
+                if( lProductos != null && !lProductos.isEmpty() ) {
+                    productos = ArrayUtils.addAll( productos,
+                            obtenerProductos(
+                                    lProductos.get( contadorBeneficiario ).getProductos(),
+                                    oDatosPlan ) );
+                }
                 beneficiario.setListaProductos( productos );
 
                 beneficiarios.add( beneficiario );
+                contadorBeneficiario++;
             }
+        }
+    }
+
+    protected es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario[] obtenerBeneficiarios(
+            final DatosAlta oDatosAlta, final List< ProductoPolizas > lProductos,
+            final List< BeneficiarioPolizas > lBeneficiarios, final DatosContratacionPlan oDatosPlan ) {
+        List< es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario > beneficiarios;
+
+        // Si hay lista de beneficiarios se trata de una inclusion de beneficiarios
+        if( lBeneficiarios != null && lBeneficiarios.size() > 0 ) {
+            beneficiarios = incluirBeneficiarios(lBeneficiarios, oDatosAlta, oDatosPlan);
         } else {
             // Si no hay lista de beneficiarios se trata de un alta
-            // Primero se procesa el titular
-            es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
-
-            beneficiario.setFechaNacimiento(
-                    cambiarFecha( oDatosAlta.getTitular().getDatosPersonales().getFNacimiento(),
-                            oDatosAlta.getFAlta() ) );
-            beneficiario.setParentesco( 1 );
-            // aunque se permite el genero 3 cuando no hay uno definido no podemos usarlo.
-            // Así que enviamos un 2 (por temas de ginecologia tambien).
-            beneficiario.setSexo( oDatosAlta.getTitular().getDatosPersonales().getGenSexo() == 0 ? 2
-                    : oDatosAlta.getTitular().getDatosPersonales().getGenSexo() );
-            beneficiario.setIdProfesion( 1 );
-            beneficiario.setNombre(
-                    String.valueOf( oDatosAlta.getTitular().getDatosPersonales().getNombre() ) );
-            if( oDatosAlta.getTitular() instanceof DatosAseguradoInclusion ) {
-                final DatosAseguradoInclusion dai = ( DatosAseguradoInclusion )oDatosAlta.getTitular();
-                if( dai.getSIdCliente() != null && dai.getSIdCliente() > 0 ) {
-                    beneficiario.setIdCliente( dai.getSIdCliente().intValue() );
-                }
-            }
-
-            // Si hay lista de productos se incluyen como productos añadidos al alta
-            Producto[] productos = obtenerProductosAsegurado(
-                    oDatosAlta.getTitular().getProductosContratados(), oDatosPlan );
-            if( lProductos != null && !lProductos.isEmpty() ) {
-                productos = ArrayUtils.addAll( productos,
-                        obtenerProductos( lProductos.get( 0 ).getProductos(), oDatosPlan ) );
-            }
-            beneficiario.setListaProductos( productos );
-
-            /*
-             * // Las procedencias pueden venir de tarjetas Sanitas List<String> tarjetas = ( (
-             * DatosAltaAsegurados )oDatosAlta ).getLNumTarjAsegurados(); if (tarjetas != null &&
-             * !tarjetas.isEmpty()){ String tarjeta = tarjetas.get( 0 ); obtenerProcedencia(tarjeta,
-             * oDatosAlta.getTitular().getDatosPersonales(), beneficiario); }else{
-             * beneficiario.setProcedencia( obtenerProcedencia(lProductos) ); }
-             */
-            beneficiarios.add( beneficiario );
-
-            // Y luego se procesan el resto de asegurados
-            if( oDatosAlta.getAsegurados() != null && oDatosAlta.getAsegurados().size() > 0 ) {
-                final Iterator< DatosAseguradoInclusion > iteradorAsegurados = oDatosAlta.getAsegurados()
-                        .iterator();
-                int contadorBeneficiario = 1;
-                while( iteradorAsegurados.hasNext() ) {
-                    final DatosAseguradoInclusion oDatosAsegurado = iteradorAsegurados.next();
-
-                    beneficiario = new es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Beneficiario();
-
-                    beneficiario.setFechaNacimiento(
-                            cambiarFecha( oDatosAsegurado.getDatosPersonales().getFNacimiento(),
-                                    oDatosAlta.getFAlta() ) );
-                    beneficiario.setParentesco( 11 );
-                    /* Permiten el genero 3 cuando no hay uno definido no podemos usarlo.
-                    Así que enviamos un 2 (por temas de ginecologia tambien).
-                     */
-                    beneficiario.setSexo( oDatosAsegurado.getDatosPersonales().getGenSexo() == 0 ? 2
-                            : oDatosAsegurado.getDatosPersonales().getGenSexo() );
-                    beneficiario.setNombre( oDatosAsegurado.getDatosPersonales().getNombre() );
-                    beneficiario.setIdProfesion( 1 );
-                    if( oDatosAsegurado.getSIdCliente() != null ) {
-                        beneficiario.setIdCliente( oDatosAsegurado.getSIdCliente().intValue() );
-                    }
-
-                    productos = obtenerProductosAsegurado(
-                            oDatosAsegurado.getProductosContratados(), oDatosPlan );
-                    if( lProductos != null && !lProductos.isEmpty() ) {
-                        productos = ArrayUtils.addAll( productos,
-                                obtenerProductos(
-                                        lProductos.get( contadorBeneficiario ).getProductos(),
-                                        oDatosPlan ) );
-                    }
-                    beneficiario.setListaProductos( productos );
-
-                    beneficiarios.add( beneficiario );
-                    contadorBeneficiario++;
-                }
-            }
+            beneficiarios = altaBeneficiario(oDatosAlta, oDatosPlan, lProductos);
         }
 
         return beneficiarios.toArray(
