@@ -104,31 +104,31 @@ public class RealizarSimulacion {
             final boolean desglosar, final Map< String, Object > hmValores )
             throws Exception {
 
-        final Map< String, Object > hmSimulacion = new HashMap< String, Object >();
+        final Map< String, Object > hmSimulacion = new HashMap<>();
         @SuppressWarnings( "unchecked" ) final List< String > lExcepciones = ( List< String > )hmValores
                 .get( "EXCEPCIONES" );
         final DatosContratacionPlan oDatosPlan = ( DatosContratacionPlan )hmValores
                 .get( StaticVarsContratacion.DATOS_PLAN );
 
-        final List< Primas > primas = new ArrayList< Primas >();
+        final List< Primas > primas = new ArrayList<>();
         final Double descuentosTotales[] = { 0.0, 0.0, 0.0, 0.0 };
         final Double pagoTotal[] = { 0.0, 0.0, 0.0, 0.0 };
         final Double precioConPromocion[] = { 0.0, 0.0, 0.0, 0.0 };
-        final List< List< PrimasPorProducto > > primasDesglosadas = new ArrayList< List< PrimasPorProducto > >();
-        final List< List< PromocionAplicada > > promociones = new ArrayList< List< PromocionAplicada > >();
-        final List< List< es.sanitas.soporte.Recibo > > recibos = new ArrayList< List< es.sanitas.soporte.Recibo > >();
-        final List< String > errores = new ArrayList< String >();
+        final List< List< PrimasPorProducto > > primasDesglosadas = new ArrayList<>();
+        final List< List< PromocionAplicada > > promociones = new ArrayList<>();
+        final List< List< es.sanitas.soporte.Recibo > > recibos = new ArrayList<>();
+        final List< String > errores = new ArrayList<>();
 
         Set< FrecuenciaEnum > frecuenciasTarificar = resolverFrecuenciasTarificar(hmValores, lBeneficiarios, oDatosAlta);
 
-        final Collection< Callable< TarificacionPoliza > > solvers = new ArrayList< Callable< TarificacionPoliza > >(
-                0 );
+        final Collection< Callable< TarificacionPoliza > > solvers = new ArrayList<>(
+                0);
         for( final FrecuenciaEnum frecuencia : frecuenciasTarificar ) {
             solvers.add( simularPolizaFrecuencia( hmValores, oDatosAlta, lProductos, lBeneficiarios,
                     frecuencia ) );
         }
-        final CompletionService< TarificacionPoliza > ecs = new ExecutorCompletionService< TarificacionPoliza >(
-                pool );
+        final CompletionService< TarificacionPoliza > ecs = new ExecutorCompletionService<>(
+                pool);
 
         int numeroLlamadas = resolverLlamadasTarificacion(solvers, ecs);
         final List< TarificacionPoliza > resultadoSimulaciones = llamadaAsincronaServicioSimulacion(numeroLlamadas, ecs);
@@ -449,7 +449,7 @@ public class RealizarSimulacion {
                 final String[] st = coeficientesTier.split( SEPARADOR_TIER );
 
                 infoTier = new InfoTier();
-                final List< TierProducto > tierProductos = new ArrayList< TierProducto >();
+                final List< TierProducto > tierProductos = new ArrayList<>();
                 int i = 1;
                 for( final String idProducto : productos ) {
                     final TierProducto tier = new TierProducto();
@@ -664,7 +664,7 @@ public class RealizarSimulacion {
 
     private Producto[] obtenerProductos( final List< ProductoCobertura > productosCobertura,
             final DatosContratacionPlan oDatosPlan ) {
-        final List< Producto > productos = new ArrayList< Producto >();
+        final List< Producto > productos = new ArrayList<>();
         if( productosCobertura != null && !productosCobertura.isEmpty() ) {
             for( final ProductoCobertura producto : productosCobertura ) {
                 productos.add( obtenerProducto( producto, oDatosPlan ) );
@@ -676,7 +676,7 @@ public class RealizarSimulacion {
 
     private Producto[] obtenerProductosAsegurado( final List< DatosProductoAlta > productosCobertura,
             final DatosContratacionPlan oDatosPlan ) {
-        final List< Producto > productos = new ArrayList< Producto >();
+        final List< Producto > productos = new ArrayList<>();
         if( productosCobertura != null && !productosCobertura.isEmpty() ) {
             for( final DatosProductoAlta producto : productosCobertura ) {
                 productos.add( obtenerProducto( producto, oDatosPlan ) );
@@ -784,7 +784,7 @@ public class RealizarSimulacion {
      * @return lista de PromocionAplicada con la información de las promociones aplicadas.
      */
     private List< PromocionAplicada > toPromocionAplicadaList( final Promocion[] promociones ) {
-        final List< PromocionAplicada > promocionesParam = new ArrayList< PromocionAplicada >();
+        final List< PromocionAplicada > promocionesParam = new ArrayList<>();
 
         for( final Promocion promocion : promociones ) {
             final PromocionAplicada promocionParam = toPromocionAplicada( promocion );
@@ -808,7 +808,7 @@ public class RealizarSimulacion {
     private List< PromocionAplicada > recuperarPromocionesAgrupadas( final es.sanitas.seg.simulacionpoliza.services.api.simulacion.vo.Promocion[] promociones,
             final int numeroAsegurados ) {
 
-        List< PromocionAplicada > promocionesAgrupadas = new ArrayList< PromocionAplicada >();
+        List< PromocionAplicada > promocionesAgrupadas = new ArrayList<>();
         if( promociones != null && promociones.length > 0 ) {
             LOG.debug( promociones.toString() );
             final int numPromociones = promociones.length / numeroAsegurados;
@@ -849,7 +849,7 @@ public class RealizarSimulacion {
      * @return lista de Recibo con la información de los recibos de la simulación.
      */
     private List< es.sanitas.soporte.Recibo > toReciboList( final ReciboProducto[] recibos ) {
-        final List< es.sanitas.soporte.Recibo > recibosList = new LinkedList< es.sanitas.soporte.Recibo >();
+        final List< es.sanitas.soporte.Recibo > recibosList = new LinkedList<>();
 
         if( recibos == null ) {
             return recibosList;
