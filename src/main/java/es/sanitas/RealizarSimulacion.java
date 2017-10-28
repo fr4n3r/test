@@ -129,17 +129,9 @@ public class RealizarSimulacion {
         }
         final CompletionService< TarificacionPoliza > ecs = new ExecutorCompletionService< TarificacionPoliza >(
                 pool );
-        int n = 0;
-        for( final Callable< TarificacionPoliza > s : solvers ) {
-            try {
-                ecs.submit( s );
-                n++;
-            } catch( final RuntimeException ree ) {
-                LOG.error( "RejectedExecutionException con el metodo " + s.toString(), ree );
-            }
-        }
-        final List< TarificacionPoliza > resultadoSimulaciones = llamadaAsincronaServicioSimulacion(n, ecs);
 
+        int numeroLlamadas = resolverLlamadasTarificacion(solvers, ecs);
+        final List< TarificacionPoliza > resultadoSimulaciones = llamadaAsincronaServicioSimulacion(numeroLlamadas, ecs);
 
         for( final FrecuenciaEnum frecuencia : frecuenciasTarificar ) {
             final TarificacionPoliza retornoPoliza = IterableUtils.find( resultadoSimulaciones,
@@ -281,6 +273,19 @@ public class RealizarSimulacion {
             hmSimulacion.put( StaticVarsContratacion.PRECIOS_SIN_PROMOCION_SIMULACION, pagoTotal );
         }
         return hmSimulacion;
+    }
+
+    private int resolverLlamadasTarificacion(Collection< Callable< TarificacionPoliza > > solvers, final CompletionService<TarificacionPoliza> ecs){
+        int n = 0;
+        for( final Callable< TarificacionPoliza > s : solvers ) {
+            try {
+                ecs.submit( s );
+                n++;
+            } catch( final RuntimeException ree ) {
+                LOG.error( "RejectedExecutionException con el metodo " + s.toString(), ree );
+            }
+        }
+        return n;
     }
 
     private Set< FrecuenciaEnum > resolverFrecuenciasTarificar(final Map< String, Object > hmValores,
